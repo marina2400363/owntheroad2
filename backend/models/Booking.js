@@ -31,6 +31,11 @@ const BookingSchema = new mongoose.Schema(
       enum: ['pending', 'confirmed', 'cancelled'],
       default: 'pending',
     },
+    pickupLocation: {
+  branchName: String,
+  address: String,
+  mapLink: String,
+    },
   },
   {
     timestamps: true,
