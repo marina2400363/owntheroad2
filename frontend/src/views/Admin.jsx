@@ -389,7 +389,7 @@ const Admin = () => {
                       <td><strong>{car.make} {car.model}</strong></td>
                       <td>{car.year}</td>
                       <td>{car.type}</td>
-                      <td><strong>${car.pricePerDay.toFixed(2)}</strong></td>
+                      <td><strong>{car.pricePerDay.toFixed(2)}EGP</strong></td>
                       <td>
                         <button
                           onClick={() => handleToggleAvailability(car)}
@@ -509,7 +509,7 @@ const Admin = () => {
                           {booking.status === 'pending' && (
                             <>
                               <select
-  onChange={(e) => handleUpdateBookingStatus(booking._id, 'confirmed', e.target.value)}
+                            onChange={(e) => handleUpdateBookingStatus(booking._id, 'confirmed', e.target.value)}
   defaultValue=""
   className="btn btn-success"
   style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}
