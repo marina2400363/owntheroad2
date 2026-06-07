@@ -1,15 +1,8 @@
-// =================================================================
-// CONTROLLER: bookingController.js
-// Part of the MVC Controller layer. Handles booking rentals, double
-// booking checking, dynamic pricing calculation, and booking CRUD.
-// =================================================================
 
 const Booking = require('../models/Booking');
 const Car = require('../models/Car');
 
-// @desc    Create a new booking
-// @route   POST /api/bookings
-// @access  Private
+
 exports.createBooking = async (req, res, next) => {
   try {
     const { carId, startDate, endDate } = req.body;
@@ -22,7 +15,7 @@ exports.createBooking = async (req, res, next) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const now = new Date();
-    // Normalize now to start of today for fair date checking
+    
     now.setHours(0, 0, 0, 0);
 
     if (start < now) {
@@ -35,7 +28,7 @@ exports.createBooking = async (req, res, next) => {
       throw new Error('End date must be after the start date');
     }
 
-    // Verify car exists and is available
+    
     const car = await Car.findById(carId);
     if (!car) {
       res.status(404);
@@ -175,7 +168,7 @@ exports.updateBooking = async (req, res, next) => {
       throw new Error('Not authorized to modify this booking');
     }
 
-    // If request is by user (non-admin), they can ONLY request cancellation
+    
     if (!isAdmin) {
       if (req.body.status && req.body.status !== 'cancelled') {
         res.status(403);
@@ -183,12 +176,13 @@ exports.updateBooking = async (req, res, next) => {
       }
       booking.status = 'cancelled';
     } else {
-      // If admin, they can update dates, price, status, etc.
+     
       if (req.body.status) booking.status = req.body.status;
+      if (req.body.pickupLocation) booking.pickupLocation = req.body.pickupLocation;
       if (req.body.startDate) booking.startDate = new Date(req.body.startDate);
       if (req.body.endDate) booking.endDate = new Date(req.body.endDate);
       
-      // Recalculate price if dates changed
+      
       if (req.body.startDate || req.body.endDate) {
         const carObj = await Car.findById(booking.car);
         const timeDiff = new Date(booking.endDate).getTime() - new Date(booking.startDate).getTime();
@@ -199,7 +193,7 @@ exports.updateBooking = async (req, res, next) => {
 
     await booking.save();
 
-    // Populate data for return
+   
     const updatedBooking = await Booking.findById(booking._id)
       .populate('user', 'name email')
       .populate('car', 'make model year type pricePerDay imageUrl');
@@ -214,9 +208,7 @@ exports.updateBooking = async (req, res, next) => {
   }
 };
 
-// @desc    Delete booking (CRUD Operation)
-// @route   DELETE /api/bookings/:id
-// @access  Private
+
 exports.deleteBooking = async (req, res, next) => {
   try {
     const booking = await Booking.findById(req.params.id);
