@@ -40,8 +40,7 @@ exports.createBooking = async (req, res, next) => {
       throw new Error('This car is currently marked as unavailable by admin');
     }
 
-    // Check for double booking (overlapping dates for this car)
-    // Overlap condition: (newStart <= existingEnd) AND (newEnd >= existingStart)
+    
     const conflictingBooking = await Booking.findOne({
       car: carId,
       status: { $ne: 'cancelled' },
@@ -58,22 +57,20 @@ exports.createBooking = async (req, res, next) => {
       throw new Error('This car is already booked for the selected dates');
     }
 
-    // Calculate dynamic pricing based on rental days (minimum 1 day)
+    
     const timeDiff = end.getTime() - start.getTime();
     const totalDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) || 1;
     const totalPrice = totalDays * car.pricePerDay;
-
-    // Create booking
     const booking = await Booking.create({
       user: req.user._id,
       car: carId,
       startDate: start,
       endDate: end,
       totalPrice,
-      status: 'pending', // Default state is pending, requiring admin validation
+      status: 'pending', 
     });
 
-    // Populate user and car info before returning
+   
     const populatedBooking = await Booking.findById(booking._id)
       .populate('user', 'name email')
       .populate('car', 'make model year type pricePerDay imageUrl');
@@ -88,21 +85,19 @@ exports.createBooking = async (req, res, next) => {
   }
 };
 
-// @desc    Get bookings (Admins get all; users get their own)
-// @route   GET /api/bookings
-// @access  Private
+
 exports.getBookings = async (req, res, next) => {
   try {
     let bookings;
 
     if (req.user.isAdmin) {
-      // Admin reads ALL bookings in the system
+      
       bookings = await Booking.find()
         .populate('user', 'name email licenseImage')
         .populate('car', 'make model year type pricePerDay imageUrl')
         .sort({ createdAt: -1 });
     } else {
-      // Normal user reads only their OWN bookings
+      
       bookings = await Booking.find({ user: req.user._id })
         .populate('car', 'make model year type pricePerDay imageUrl')
         .sort({ createdAt: -1 });
@@ -118,9 +113,7 @@ exports.getBookings = async (req, res, next) => {
   }
 };
 
-// @desc    Get single booking details
-// @route   GET /api/bookings/:id
-// @access  Private
+
 exports.getBookingById = async (req, res, next) => {
   try {
     const booking = await Booking.findById(req.params.id)
@@ -132,7 +125,7 @@ exports.getBookingById = async (req, res, next) => {
       throw new Error(`Booking not found with id ${req.params.id}`);
     }
 
-    // Verify ownership or admin privileges
+    
     if (booking.user._id.toString() !== req.user._id.toString() && !req.user.isAdmin) {
       res.status(403);
       throw new Error('Not authorized to view this booking');
@@ -147,9 +140,7 @@ exports.getBookingById = async (req, res, next) => {
   }
 };
 
-// @desc    Update booking (Cancel booking by owner, or Full status modification by Admin)
-// @route   PUT /api/bookings/:id
-// @access  Private
+
 exports.updateBooking = async (req, res, next) => {
   try {
     let booking = await Booking.findById(req.params.id);
@@ -159,7 +150,7 @@ exports.updateBooking = async (req, res, next) => {
       throw new Error(`Booking not found with id ${req.params.id}`);
     }
 
-    // Authorization checks
+    
     const isOwner = booking.user.toString() === req.user._id.toString();
     const isAdmin = req.user.isAdmin;
 
@@ -218,7 +209,7 @@ exports.deleteBooking = async (req, res, next) => {
       throw new Error(`Booking not found with id ${req.params.id}`);
     }
 
-    // Only owner or admin can delete
+    
     if (booking.user.toString() !== req.user._id.toString() && !req.user.isAdmin) {
       res.status(403);
       throw new Error('Not authorized to delete this booking');

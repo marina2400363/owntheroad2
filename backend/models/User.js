@@ -1,8 +1,3 @@
-// =================================================================
-// MODEL: User.js
-// Part of the MVC Model layer. Defines the database schema and rules
-// for User accounts (renters and administrators).
-// =================================================================
 
 const mongoose = require('mongoose');
 
@@ -31,12 +26,12 @@ const UserSchema = new mongoose.Schema(
       default: false,
     },
     licenseImage: {
-      type: String, // Path or URL to the uploaded driving license image
+      type: String, 
       default: '',
     },
   },
   {
-    timestamps: true, // Automatically manages createdAt and updatedAt fields
+    timestamps: true, 
   }
 );
 

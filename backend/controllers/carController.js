@@ -1,25 +1,13 @@
-// =================================================================
-// CONTROLLER: carController.js
-// Part of the MVC Controller layer. Handles vehicle inventory queries,
-// full CRUD operations (Admin only for modifications), advanced
-// searching, filtering, pagination, and car image uploads.
-// =================================================================
-
 const Car = require('../models/Car');
 
-// @desc    Get all cars (Paginated, filtered, searched, sorted)
-// @route   GET /api/cars
-// @access  Public
 exports.getCars = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 6;
     const skip = (page - 1) * limit;
 
-    // Build query object
     const query = {};
 
-    // Search filter: Matches make or model
     if (req.query.search) {
       query.$or = [
         { make: { $regex: req.query.search, $options: 'i' } },
@@ -27,17 +15,14 @@ exports.getCars = async (req, res, next) => {
       ];
     }
 
-    // Category Type filter
     if (req.query.type && req.query.type !== 'All') {
       query.type = req.query.type;
     }
 
-    // Availability filter
     if (req.query.available === 'true') {
       query.isAvailable = true;
     }
 
-    // Sorting options
     let sortOption = { createdAt: -1 }; // Default: Newest first
     if (req.query.sort === 'priceAsc') {
       sortOption = { pricePerDay: 1 };
@@ -45,10 +30,8 @@ exports.getCars = async (req, res, next) => {
       sortOption = { pricePerDay: -1 };
     }
 
-    // Count matching documents
     const totalCars = await Car.countDocuments(query);
 
-    // Fetch matching paginated results
     const cars = await Car.find(query)
       .sort(sortOption)
       .skip(skip)
@@ -70,9 +53,6 @@ exports.getCars = async (req, res, next) => {
   }
 };
 
-// @desc    Get single car details
-// @route   GET /api/cars/:id
-// @access  Public
 exports.getCarById = async (req, res, next) => {
   try {
     const car = await Car.findById(req.params.id);
@@ -91,9 +71,6 @@ exports.getCarById = async (req, res, next) => {
   }
 };
 
-// @desc    Create a new car
-// @route   POST /api/cars
-// @access  Private/Admin
 exports.createCar = async (req, res, next) => {
   try {
     const { make, model, year, type, pricePerDay, imageUrl } = req.body;
@@ -128,9 +105,6 @@ exports.createCar = async (req, res, next) => {
   }
 };
 
-// @desc    Update a car details
-// @route   PUT /api/cars/:id
-// @access  Private/Admin
 exports.updateCar = async (req, res, next) => {
   try {
     let car = await Car.findById(req.params.id);
@@ -140,7 +114,6 @@ exports.updateCar = async (req, res, next) => {
       throw new Error(`Car not found with id ${req.params.id}`);
     }
 
-    // Convert types and perform updates
     if (req.body.year) req.body.year = Number(req.body.year);
     if (req.body.pricePerDay) {
       const price = Number(req.body.pricePerDay);
@@ -166,9 +139,6 @@ exports.updateCar = async (req, res, next) => {
   }
 };
 
-// @desc    Delete a car
-// @route   DELETE /api/cars/:id
-// @access  Private/Admin
 exports.deleteCar = async (req, res, next) => {
   try {
     const car = await Car.findById(req.params.id);
@@ -189,9 +159,6 @@ exports.deleteCar = async (req, res, next) => {
   }
 };
 
-// @desc    Upload car image file
-// @route   POST /api/upload/car-image
-// @access  Private/Admin
 exports.uploadCarImage = async (req, res, next) => {
   try {
     if (!req.file) {

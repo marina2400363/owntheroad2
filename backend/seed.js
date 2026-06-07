@@ -1,39 +1,27 @@
-// =================================================================
-// SEED SCRIPT: seed.js
-// Connects to the local MongoDB database and populates it with
-// baseline test data: 1 Admin, 3 normal users, 10 cars with realistic
-// details, and 3 sample bookings.
-// =================================================================
-
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 
-// Load models
 const User = require('./models/User');
 const Car = require('./models/Car');
 const Booking = require('./models/Booking');
 
-// Load env variables
 dotenv.config();
 
 const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/own_the_road';
 
 const seedData = async () => {
   try {
-    // 1. Connect to MongoDB
     console.log(`Connecting to database at ${MONGO_URI}...`);
     await mongoose.connect(MONGO_URI);
     console.log('Connected to database successfully.');
 
-    // 2. Clear existing collections
     console.log('Clearing old data from collections...');
     await User.deleteMany();
     await Car.deleteMany();
     await Booking.deleteMany();
     console.log('Collections cleared.');
 
-    // 3. Create Seed Users
     console.log('Seeding user profiles...');
     const salt = await bcrypt.genSalt(10);
     const adminPassword = await bcrypt.hash('AdminPass123!', salt);
@@ -71,7 +59,6 @@ const seedData = async () => {
     ]);
     console.log(`Seeded ${users.length} users (1 Admin, 3 Standard).`);
 
-    // 4. Create Seed Cars
     console.log('Seeding car inventory...');
     const cars = await Car.create([
       {
@@ -167,23 +154,19 @@ const seedData = async () => {
     ]);
     console.log(`Seeded ${cars.length} vehicles.`);
 
-    // 5. Create Seed Bookings
     console.log('Seeding rental bookings...');
     const today = new Date();
     
-    // Booking 1: John Doe books Toyota Camry starting tomorrow for 3 days
     const start1 = new Date(today);
     start1.setDate(today.getDate() + 1);
     const end1 = new Date(today);
     end1.setDate(today.getDate() + 4);
     
-    // Booking 2: Jane Smith books BMW M4 starting next week for 5 days
     const start2 = new Date(today);
     start2.setDate(today.getDate() + 7);
     const end2 = new Date(today);
     end2.setDate(today.getDate() + 12);
 
-    // Booking 3: Bob Johnson books Jeep Wrangler starting tomorrow for 2 days (Cancelled)
     const start3 = new Date(today);
     start3.setDate(today.getDate() + 1);
     const end3 = new Date(today);
@@ -191,27 +174,27 @@ const seedData = async () => {
 
     const bookings = await Booking.create([
       {
-        user: users[1]._id, // John Doe
-        car: cars[1]._id, // Camry
+        user: users[1]._id, 
+        car: cars[1]._id, 
         startDate: start1,
         endDate: end1,
-        totalPrice: 3 * cars[1].pricePerDay, // 135
+        totalPrice: 3 * cars[1].pricePerDay, 
         status: 'confirmed',
       },
       {
-        user: users[2]._id, // Jane Smith
-        car: cars[7]._id, // BMW M4
+        user: users[2]._id,
+        car: cars[7]._id, 
         startDate: start2,
         endDate: end2,
-        totalPrice: 5 * cars[7].pricePerDay, // 900
+        totalPrice: 5 * cars[7].pricePerDay, 
         status: 'pending',
       },
       {
-        user: users[3]._id, // Bob Johnson
-        car: cars[8]._id, // Jeep Wrangler
+        user: users[3]._id, 
+        car: cars[8]._id, 
         startDate: start3,
         endDate: end3,
-        totalPrice: 2 * cars[8].pricePerDay, // 220
+        totalPrice: 2 * cars[8].pricePerDay, 
         status: 'cancelled',
       },
     ]);

@@ -1,8 +1,3 @@
-// =================================================================
-// MIDDLEWARE: adminMiddleware.js
-// Safeguards admin endpoints by checking if the authenticated user
-// has administrative privileges (isAdmin: true).
-// =================================================================
 
 const admin = (req, res, next) => {
   if (req.user && req.user.isAdmin) {

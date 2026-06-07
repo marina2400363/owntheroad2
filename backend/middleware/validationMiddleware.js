@@ -1,18 +1,11 @@
-// =================================================================
-// MIDDLEWARE: validationMiddleware.js
-// Validates incoming HTTP request bodies and params to ensure all
-// data format expectations are satisfied before reaching controllers.
-// =================================================================
 
 const mongoose = require('mongoose');
 
-// Helper to check email format
 const isValidEmail = (email) => {
   const re = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
   return re.test(String(email).toLowerCase());
 };
 
-// Validate Mongo ObjectIds in req.params.id
 exports.validateObjectId = (req, res, next) => {
   const idToCheck = req.params.id || req.body.carId || req.body.userId;
   if (idToCheck && !mongoose.Types.ObjectId.isValid(idToCheck)) {
@@ -22,7 +15,6 @@ exports.validateObjectId = (req, res, next) => {
   next();
 };
 
-// Validate User Registration
 exports.validateRegister = (req, res, next) => {
   const { name, email, password } = req.body;
 
@@ -44,7 +36,6 @@ exports.validateRegister = (req, res, next) => {
   next();
 };
 
-// Validate User Login
 exports.validateLogin = (req, res, next) => {
   const { email, password } = req.body;
 
@@ -61,7 +52,6 @@ exports.validateLogin = (req, res, next) => {
   next();
 };
 
-// Validate Car Data
 exports.validateCar = (req, res, next) => {
   const { make, model, year, type, pricePerDay, imageUrl } = req.body;
 
@@ -99,7 +89,6 @@ exports.validateCar = (req, res, next) => {
   next();
 };
 
-// Validate Booking Data
 exports.validateBooking = (req, res, next) => {
   const { carId, startDate, endDate } = req.body;
 
