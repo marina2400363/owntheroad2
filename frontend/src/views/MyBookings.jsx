@@ -268,6 +268,32 @@ const MyBookings = () => {
                       <strong style={{ color: 'var(--color-primary)', fontSize: '1.1rem' }}>${booking.totalPrice.toFixed(2)}</strong>
                     </div>
                   </div>
+                  {booking.status === 'confirmed' && booking.pickupLocation?.mapLink && (
+  <div
+    style={{
+      marginTop: '1rem',
+      padding: '1rem',
+      border: '1px solid rgba(255,255,255,0.1)',
+      borderRadius: '8px'
+    }}
+  >
+    <strong>Pickup Location</strong>
+
+    <p>{booking.pickupLocation.branchName}</p>
+
+    <p>{booking.pickupLocation.address}</p>
+
+    <a
+      href={booking.pickupLocation.mapLink}
+      target="_blank"
+      rel="noreferrer"
+      className="btn btn-primary"
+    >
+      Open in Google Maps
+    </a>
+  </div>
+)}
+
 
                   {/* Booking Actions */}
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
