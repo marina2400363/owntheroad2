@@ -18,6 +18,26 @@ const Admin = () => {
   const [cars, setCars] = useState([]);
   const [users, setUsers] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const handleUpdateBookingStatus = async (id, status, branchIndex = '') => {
+  try {
+    const updateData = { status };
+
+    if (status === 'confirmed') {
+      if (branchIndex === '') {
+        setError('Please select a pickup branch first.');
+        return;
+      }
+
+      updateData.pickupLocation = pickupBranches[branchIndex];
+    }
+
+    const res = await bookingAPI.updateBooking(id, updateData);
+    if (res.data.success) loadTabData();
+  } catch (err) {
+    console.error(err);
+    setError(err.response?.data?.message || 'Failed to update booking status.');
+  }
+};
 
   // Loading & Error States
   const [loading, setLoading] = useState(false);
@@ -236,15 +256,26 @@ const Admin = () => {
   // =================================================================
   
   // Admin updates booking status
-  const handleUpdateBookingStatus = async (id, status) => {
-    try {
-      const res = await bookingAPI.updateBooking(id, { status });
-      if (res.data.success) loadTabData();
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || 'Failed to update booking status.');
+ const handleUpdateBookingStatus = async (id, status, branchIndex = '') => {
+  try {
+    const updateData = { status };
+
+    if (status === 'confirmed') {
+      if (branchIndex === '') {
+        setError('Please select a pickup branch first.');
+        return;
+      }
+
+      updateData.pickupLocation = pickupBranches[branchIndex];
     }
-  };
+
+    const res = await bookingAPI.updateBooking(id, updateData);
+    if (res.data.success) loadTabData();
+  } catch (err) {
+    console.error(err);
+    setError(err.response?.data?.message || 'Failed to update booking status.');
+  }
+};
 
   // Admin delete booking (CRUD Delete)
   const handleDeleteBooking = async (id) => {
@@ -477,9 +508,19 @@ const Admin = () => {
                         <div style={{ display: 'inline-flex', gap: '0.4rem' }}>
                           {booking.status === 'pending' && (
                             <>
-                              <button onClick={() => handleUpdateBookingStatus(booking._id, 'confirmed')} className="btn btn-success" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}>
-                                Confirm
-                              </button>
+                              <select
+  onChange={(e) => handleUpdateBookingStatus(booking._id, 'confirmed', e.target.value)}
+  defaultValue=""
+  className="btn btn-success"
+  style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}
+ >
+  <option value="" disabled>Confirm + Branch</option>
+  {pickupBranches.map((branch, index) => (
+    <option key={branch.branchName} value={index}>
+      {branch.branchName}
+    </option>
+  ))}
+</select>
                               <button onClick={() => handleUpdateBookingStatus(booking._id, 'cancelled')} className="btn btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}>
                                 Decline
                               </button>
