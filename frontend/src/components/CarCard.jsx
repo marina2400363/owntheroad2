@@ -40,7 +40,7 @@ const CarCard = ({ car }) => {
 
       <div className="car-card-footer">
         <div className="car-card-price">
-          <span>${car.pricePerDay.toFixed(2)}</span> / day
+          <span>EGP{car.pricePerDay.toFixed(2)}</span> / day
         </div>
         
         {car.isAvailable ? (

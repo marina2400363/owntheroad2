@@ -1,8 +1,3 @@
-// =================================================================
-// MODEL: Car.js
-// Part of the MVC Model layer. Defines the database schema and rules
-// for Car inventory item objects.
-// =================================================================
 
 const mongoose = require('mongoose');
 
